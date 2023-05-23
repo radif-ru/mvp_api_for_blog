@@ -1,5 +1,5 @@
 """
-URL configuration for config project.
+URL configuration for mvp_api_for_blog project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/

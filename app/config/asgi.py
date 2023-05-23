@@ -1,5 +1,5 @@
 """
-ASGI config for config project.
+ASGI config for mvp_api_for_blog project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
