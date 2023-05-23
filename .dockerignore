@@ -1,0 +1,8 @@
+# IntellijIdea files
+**/.idea
+
+# Байт-код
+**/__pycache__
+
+# Генерируемые PyTest данные
+**/.coverage
