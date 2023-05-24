@@ -1,22 +1,25 @@
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django.db import OperationalError, ProgrammingError
+
+from users.models import Token
+from users.utils import gen_token
 
 
 class Command(BaseCommand):
-    help = 'Создание админа и пользователей'
-
-    def handle(self, *args, **options):
-        """Команды на выполнение"""
-        self.create_admin()
+    help = 'Создание пользователя или админа'
 
     @staticmethod
-    def create_admin() -> None:
-        """ Создание супер-юзера """
-        try:
-            if not User.objects.filter(username='admin'):
-                User.objects.create_superuser(
-                    username='admin',
-                    password='qwertytwerq')
-        except OperationalError or ProgrammingError as error:
-            print(f'\n{error}\n')
+    def create_user(username: str,
+                    password: str,
+                    is_superuser: bool = False) -> None:
+        """ Создание пользователя или админа """
+        if not User.objects.filter(username=username):
+            if is_superuser:
+                user: User = User.objects.create_superuser(
+                    username=username,
+                    password=password)
+            else:
+                user: User = User.objects.create_user(
+                    username=username,
+                    password=password)
+            Token.objects.create(user_id=user.id, token=gen_token(32))
