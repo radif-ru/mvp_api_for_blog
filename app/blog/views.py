@@ -4,25 +4,12 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views import View
 
-from blog.models import Article, Comment
+from .mixins import ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin
+from .models import Article, Comment
 
 
-def check_authorization(request):
-    """ Проверить авторизацию """
-    token: str = request.headers.get('Authorization')
-    if not token:
-        error: str = json.dumps({'error': 'no token'})
-        return HttpResponse(content=error, status=401)
-    user: User = User.objects.filter(token__token=token,
-                                     token__is_active=True).first()
-    if not user:
-        error: str = json.dumps({'error': 'token is not valid'})
-        return HttpResponse(content=error, status=401)
+class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin, View):
 
-    return user
-
-
-class ArticleView(View):
     def get(self, request, *args, **kwargs):
         """ Получить все статьи или статью с комментариями (по ID) """
         article_id: str = request.GET.get('id')
@@ -45,7 +32,7 @@ class ArticleView(View):
     def post(self, request, *args, **kwargs):
         """ Создать статью """
 
-        check_result = check_authorization(request)
+        check_result: HttpResponse or User = self.check_authorization()
         if check_result is HttpResponse:
             return check_result
         user: User = check_result
@@ -66,14 +53,14 @@ class ArticleView(View):
 
     def patch(self, request, *args, **kwargs):
         """ Изменить статью """
-        check_result = check_authorization(request)
+        check_result: HttpResponse or User = self.check_authorization()
         if check_result is HttpResponse:
             return check_result
         user: User = check_result
 
-        body: [] = request.body.decode('utf-8').split('\r\n')
+        body: list = self.parse_request_body()
         data: dict = {}
-        article_id = 0
+        article_id: int = 0
         for num, el in enumerate(body, start=0):
             if 'name="title"' in el:
                 data['title'] = body[num + 2]
@@ -101,13 +88,13 @@ class ArticleView(View):
 
     def delete(self, request, *args, **kwargs):
         """ Удалить статью (перенести в архив) """
-        check_result = check_authorization(request)
+        check_result: HttpResponse or User = self.check_authorization()
         if check_result is HttpResponse:
             return check_result
         user: User = check_result
 
-        body: [] = request.body.decode('utf-8').split('\r\n')
-        article_id = 0
+        body: list = self.parse_request_body()
+        article_id: int = 0
         for num, el in enumerate(body, start=0):
             if 'name="id"' in el:
                 article_id: int = body[num + 2]
