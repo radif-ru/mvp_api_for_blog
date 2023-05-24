@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path
 
 from blog.views import ArticleView
+from users.views import TokenView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/articles/', ArticleView.as_view(), name='articles')
+    path('api/articles/', ArticleView.as_view(), name='articles'),
+    path('api/token/', TokenView.as_view(), name='token'),
 ]
