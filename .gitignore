@@ -1,0 +1,20 @@
+# IntellijIdea files
+**/.idea
+
+# Байт-код
+**/__pycache__
+
+# Переменные окружения
+#**/*.env
+
+# Все файлы логов
+**/*.log
+**/*.log.*
+
+# Собранные с помощью collect_static статические файлы
+**/staticfiles/
+
+**/mediafiles/
+
+# Генерируемые PyTest данные
+**/.coverage
