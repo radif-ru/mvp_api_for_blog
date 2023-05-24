@@ -4,18 +4,18 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views import View
 
-from .mixins import ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin
+from .mixins import ViewCheckAuthorizationMixin, ViewParseRequestBodyMixin
 from .models import Article, Comment
 
 
-class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin, View):
+class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBodyMixin, View):
 
     def get(self, request, *args, **kwargs):
         """ Получить все статьи или статью с комментариями (по ID) """
         article_id: str = request.GET.get('id')
         if article_id:
             article_id: int = int(article_id)
-            article = Article.objects.filter(id=article_id).first()
+            article: Article = Article.objects.filter(id=article_id).first()
             comments: [] = list(Comment.objects.filter(
                 article_id=article_id).values())
             data: dict = {'title': article.title,
@@ -33,7 +33,7 @@ class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin, View):
         """ Создать статью """
 
         check_result: HttpResponse or User = self.check_authorization()
-        if check_result is HttpResponse:
+        if isinstance(check_result, HttpResponse):
             return check_result
         user: User = check_result
 
@@ -54,7 +54,7 @@ class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin, View):
     def patch(self, request, *args, **kwargs):
         """ Изменить статью """
         check_result: HttpResponse or User = self.check_authorization()
-        if check_result is HttpResponse:
+        if isinstance(check_result, HttpResponse):
             return check_result
         user: User = check_result
 
@@ -89,7 +89,7 @@ class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin, View):
     def delete(self, request, *args, **kwargs):
         """ Удалить статью (перенести в архив) """
         check_result: HttpResponse or User = self.check_authorization()
-        if check_result is HttpResponse:
+        if isinstance(check_result, HttpResponse):
             return check_result
         user: User = check_result
 
@@ -107,7 +107,10 @@ class ArticleView(ViewCheckAuthorizationMixin, ViewParseRequestBdyMixin, View):
                     article and article.first().author.id == user.id
             ) or user.is_superuser:
                 article.update(is_active=False)
-                return HttpResponse(status=200)
+                return HttpResponse(status=204)
+        else:
+            error: str = json.dumps({'error': 'article id'})
+            return HttpResponse(content=error, status=400)
 
         error: str = json.dumps({'error': 'forbidden act'})
         return HttpResponse(content=error, status=400)
