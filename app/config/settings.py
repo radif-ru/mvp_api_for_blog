@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Переменные окружения.
 # Использую для локальных тестов, в прод переменные окружения подгружает
 # docker-compose
-environment_variables = os.path.join(BASE_DIR, '../.dev.env')
+environment_variables = os.path.join(BASE_DIR, '../.loc.env')
 if os.path.exists(environment_variables):
     load_dotenv(environment_variables)
 
@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -144,3 +144,5 @@ IMAGES_UPLOAD_DIRECTORY = 'upload_images'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JSON_PATH = 'json'
