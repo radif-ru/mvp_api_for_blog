@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from blog.mixins import ModelDeleteMixin
 
-class Token(models.Model):
+
+class Token(ModelDeleteMixin, models.Model):
     """ Модель токена """
     user = models.ForeignKey(User, verbose_name='пользователь',
                              on_delete=models.CASCADE, null=False, blank=False)
@@ -12,7 +14,7 @@ class Token(models.Model):
                                     null=False, blank=False)
 
     def __str__(self):
-        return f'Пользователь: {self.user} | Токен: {self.token}'
+        return f'{self.token} ({self.id})'
 
     class Meta:
         verbose_name = 'Токен'

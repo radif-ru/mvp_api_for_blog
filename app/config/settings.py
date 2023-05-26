@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+from collections import namedtuple
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -18,8 +19,8 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Переменные окружения.
-# Использую для локальных тестов, в прод переменные окружения подгружает
-# docker-compose
+# Использую для локального запуска вне докер контейнера для работы с дебагером
+# Pycharm, в прод переменные окружения подгружает docker-compose
 environment_variables = os.path.join(BASE_DIR, '../.loc.env')
 if os.path.exists(environment_variables):
     load_dotenv(environment_variables)
@@ -146,3 +147,15 @@ IMAGES_UPLOAD_DIRECTORY = 'upload_images'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 JSON_PATH = 'json'
+
+RESPONSE_MESSAGES = namedtuple('RESPONSE_STATUSES',
+                               ('success', 'no_success', 'no_required_fields', 'forbidden_act', 'not_found',
+                                'incorrect_data', 'no_token', 'not_valid_token'))
+RESPONSE_MESSAGES.success = 'success'
+RESPONSE_MESSAGES.no_success = 'no success'
+RESPONSE_MESSAGES.no_required_fields = 'no_required_fields'
+RESPONSE_MESSAGES.forbidden_act = 'forbidden act'
+RESPONSE_MESSAGES.not_found = 'not found'
+RESPONSE_MESSAGES.incorrect_data = 'incorrect data'
+RESPONSE_MESSAGES.no_token = 'no token'
+RESPONSE_MESSAGES.not_valid_token = 'not valid token'
