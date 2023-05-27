@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import mixins.model
 
 
 class Migration(migrations.Migration):
@@ -27,5 +28,6 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Токены',
                 'unique_together': {('token', 'user')},
             },
+            bases=(mixins.model.ModelDeleteMixin, models.Model),
         ),
     ]

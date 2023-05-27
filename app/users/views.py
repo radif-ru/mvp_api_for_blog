@@ -1,14 +1,13 @@
-import json
-
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views import View
 
-from users.decorators import user_auth_with_token
-from blog.mixins import ViewParseRequestBodyMixin
 from config.settings import RESPONSE_MESSAGES
+from decorators.auth import user_auth_with_token
+from mixins.view import ViewParseRequestBodyMixin
 from users.models import Token
-from users.utils import gen_token
+from utils.response import get_response_serialized_in_json
+from utils.token import gen_token
 
 
 class TokenView(ViewParseRequestBodyMixin, View):
@@ -28,10 +27,14 @@ class TokenView(ViewParseRequestBodyMixin, View):
 
         if not username:
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return HttpResponse(content=json.dumps(message), status=400)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=400)
+            return response
         if not password:
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return HttpResponse(content=json.dumps(message), status=400)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=400)
+            return response
 
         user: User = User.objects.filter(username=username).first()
         if user:
@@ -39,16 +42,22 @@ class TokenView(ViewParseRequestBodyMixin, View):
                 token: str = gen_token(32)
                 token_obj: Token = Token.objects.create(user_id=user.id,
                                                         token=token)
-
                 message['token']: str = token_obj.token
                 message['id']: str = token_obj.id
-                return HttpResponse(content=json.dumps(message), status=201)
+                response: HttpResponse = get_response_serialized_in_json(
+                    content=message, status=201)
+                return response
             else:
                 message['error']: str = RESPONSE_MESSAGES.incorrect_data
-                return HttpResponse(content=json.dumps(message), status=401)
+                response: HttpResponse = get_response_serialized_in_json(
+                    content=message, status=401)
+                return response
         else:
             message['error']: str = RESPONSE_MESSAGES.not_found
-            return HttpResponse(content=json.dumps(message), status=401)
+
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=401)
+            return response
 
     @user_auth_with_token
     def delete(self, request, *args, **kwargs):
@@ -61,7 +70,6 @@ class TokenView(ViewParseRequestBodyMixin, View):
         Возвращает результат выполнения и описание ошибки (если есть).
         """
         user: User = request.user
-
         body: list = self.parse_request_body()
         token_id: int = 0
         token_content: str = ''
@@ -85,7 +93,11 @@ class TokenView(ViewParseRequestBodyMixin, View):
 
         if token:
             token.delete()
-            return HttpResponse(content=json.dumps(message), status=204)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=204)
+            return response
         else:
             message['error']: str = RESPONSE_MESSAGES.not_found
-            return HttpResponse(content=json.dumps(message), status=401)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=401)
+            return response

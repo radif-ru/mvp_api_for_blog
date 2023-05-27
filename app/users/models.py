@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from blog.mixins import ModelDeleteMixin
+from mixins.model import ModelDeleteMixin
 
 
 class Token(ModelDeleteMixin, models.Model):

@@ -2,7 +2,7 @@ import os
 
 from django.core.management.base import BaseCommand
 
-from blog.utils import load_from_json
+from utils.json import load_from_json
 from .add_users import Command as AddUsers
 from blog.management.commands.add_article import Command as AddArticles
 from blog.management.commands.add_comment import Command as AddComments

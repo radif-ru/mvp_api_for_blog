@@ -1,12 +1,11 @@
-import json
-
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views import View
 
 from config.settings import RESPONSE_MESSAGES
-from users.decorators import user_auth_with_token
-from .mixins import ViewParseRequestBodyMixin
+from decorators.auth import user_auth_with_token
+from mixins.view import ViewParseRequestBodyMixin
+from utils.response import get_response_serialized_in_json
 from .models import Article, Comment
 
 
@@ -19,23 +18,25 @@ class ArticleView(ViewParseRequestBodyMixin,
         по переданному идентификатору.
         """
 
-        article_id: int = int(request.GET.get('id'))
+        article_id: int = int(request.GET.get('id')) if request.GET.get(
+            'id') else None
         if article_id:
             article: Article = Article.objects.filter(id=article_id).first()
-            comments: list = list(Comment.objects.filter(
-                article_id=article_id).values())
+            comments: list = list(
+                Comment.objects.filter(article_id=article_id).values())
             data: dict = {'id': article.id,
                           'title': article.title,
                           'text': article.text,
                           'author': article.author.username,
                           'comments': comments}
-            json_data: str = json.dumps(data, ensure_ascii=False)
-            return HttpResponse(content=json_data, status=200)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=data)
+            return response
 
         articles: [Article] = Article.objects.filter(is_active=True)
-        json_articles: str = json.dumps(list(articles.values()),
-                                        ensure_ascii=False)
-        return HttpResponse(content=json_articles, status=200)
+        response: HttpResponse = get_response_serialized_in_json(
+            content=list(articles.values()))
+        return response
 
     @user_auth_with_token
     def post(self, request, *args, **kwargs):
@@ -52,16 +53,22 @@ class ArticleView(ViewParseRequestBodyMixin,
         if not title:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return HttpResponse(content=json.dumps(message), status=400)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=400)
+            return response
         if not text:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return HttpResponse(content=json.dumps(message), status=400)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=400)
+            return response
 
         article: Article = Article.objects.create(author_id=user.id,
                                                   title=title, text=text)
         message['article_id']: str = article.id
-        return HttpResponse(content=json.dumps(message), status=201)
+        response: HttpResponse = get_response_serialized_in_json(
+            content=message, status=201)
+        return response
 
     @user_auth_with_token
     def patch(self, request, *args, **kwargs):
@@ -87,22 +94,32 @@ class ArticleView(ViewParseRequestBodyMixin,
         if not article_id or ('title' not in data and 'text' not in data):
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return HttpResponse(content=json.dumps(message), status=400)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=400)
+            return response
 
         article: [Article] = Article.objects.filter(id=article_id,
                                                     is_active=True)
         if not article:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.not_found
-            return HttpResponse(content=json.dumps(message), status=404)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=404)
+            return response
 
         if (article.first().author.id == user.id) or user.is_superuser:
             article.update(**data)
-            return HttpResponse(content=json.dumps(message), status=200)
+
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message)
+            return response
         else:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.forbidden_act
-            return HttpResponse(content=json.dumps(message), status=403)
+
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=403)
+            return response
 
     @user_auth_with_token
     def delete(self, request, *args, **kwargs):
@@ -124,19 +141,27 @@ class ArticleView(ViewParseRequestBodyMixin,
         if not article_id:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return HttpResponse(content=json.dumps(message), status=400)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=400)
+            return response
 
         article: Article or None = Article.objects.filter(
             id=article_id, is_active=True).first()
         if not article:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.not_found
-            return HttpResponse(content=json.dumps(message), status=404)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=404)
+            return response
 
         if (article.author.id == user.id) or user.is_superuser:
             article.delete()
-            return HttpResponse(content=json.dumps(message), status=204)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=204)
+            return response
         else:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.forbidden_act
-            return HttpResponse(content=json.dumps(message), status=403)
+            response: HttpResponse = get_response_serialized_in_json(
+                content=message, status=403)
+            return response

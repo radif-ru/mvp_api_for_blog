@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from users.models import Token
-from users.utils import gen_token
+from utils.token import gen_token
 
 
 class Command(BaseCommand):
