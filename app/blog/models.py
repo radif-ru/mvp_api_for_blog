@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from blog.mixins import ModelPieceTextMixin, ModelDeleteMixin
+from mixins.model import ModelDeleteMixin, ModelPieceTextMixin
 
 
 class Article(ModelDeleteMixin, ModelPieceTextMixin, models.Model):

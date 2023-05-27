@@ -1,7 +1,7 @@
 import json
 import os
 
-from config.settings import JSON_PATH
+from config.settings import JSON_FILES_PATH
 
 
 def load_from_json(file_name: str) -> list:
@@ -9,7 +9,7 @@ def load_from_json(file_name: str) -> list:
     :param file_name: имя файла без постфикса, расширения
     """
     with open(
-            os.path.join(JSON_PATH, f'{file_name}.json'),
+            os.path.join(JSON_FILES_PATH, f'{file_name}.json'),
             encoding='utf-8'
     ) as infile:
         return json.load(infile)

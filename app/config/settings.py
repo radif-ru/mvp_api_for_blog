@@ -146,7 +146,7 @@ IMAGES_UPLOAD_DIRECTORY = 'upload_images'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-JSON_PATH = 'json'
+JSON_FILES_PATH = 'files/json'
 
 RESPONSE_MESSAGES = namedtuple('RESPONSE_STATUSES',
                                ('success', 'no_success', 'no_required_fields', 'forbidden_act', 'not_found',
