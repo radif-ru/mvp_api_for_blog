@@ -9,7 +9,7 @@ from config.settings import RESPONSE_MESSAGES
 def json_request(function):
     """ Проверить соответствие отправляемых клиентом данных `JSON`-формату.
     При несоответствии клиенту возвращается сообщение об этом.
-    Возвращает десериализованные данные.
+    Возвращает десериализованные данные `data`.
     """
 
     def wrap(self, request, *args, **kwargs):

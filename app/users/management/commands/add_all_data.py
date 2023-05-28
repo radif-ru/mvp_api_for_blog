@@ -3,32 +3,46 @@ import os
 from django.core.management.base import BaseCommand
 
 from utils.json import load_from_json
-from .add_users import Command as AddUsers
-from blog.management.commands.add_article import Command as AddArticles
-from blog.management.commands.add_comment import Command as AddComments
+from .add_user import Command as AddUser
+from blog.management.commands.add_article import Command as AddArticle
+from blog.management.commands.add_comment import Command as AddComment
 
 
 class Command(BaseCommand):
-    help = 'Сборка всех подготовленных данных'
+    help = 'Подготовка и выполнение миграций. ' \
+           'Сборка стандартных и подготовленных статических файлов. ' \
+           'Сборка всех подготовленных данных в БД, для таблиц ' \
+           '`users`, `articles`, `comments` из файлов, ' \
+           'которые хранятся в `./app/files/json`. ' \
+           'К создаваемым пользователям рандомно прикрепляются статьи, ' \
+           'а к статьям генерируются рандомные комментарии ' \
+           'с рандомными авторами, данные связываются только с существующими.'
 
     def handle(self, *args, **options):
+        """ Подготовка и выполнение миграций.
+        Сборка стандартных и подготовленных статических файлов.
+        Сборка всех подготовленных данных в БД,
+        для таблиц `users`, `articles`, `comments` из файлов,
+        которые хранятся в `./app/files/json`,
+        данные связываются только с существующими.
+        """
         self.migrate()
         self.collect_static()
 
         users = load_from_json('users')
         for user in users:
-            AddUsers.create_user(username=user['username'],
-                                 password=user['password'],
-                                 is_superuser=user['is_superuser'])
+            AddUser.create_user(username=user['username'],
+                                password=user['password'],
+                                is_superuser=user['is_superuser'])
 
         articles = load_from_json('articles')
         for article in articles:
-            AddArticles.add_article(title=article['title'],
-                                    text=article['text'])
+            AddArticle.add_article(title=article['title'],
+                                   text=article['text'])
 
         comments = load_from_json('comments')
         for comment in comments:
-            AddComments.add_comment(text=comment['text'])
+            AddComment.add_comment(text=comment['text'])
 
     @staticmethod
     def migrate():
