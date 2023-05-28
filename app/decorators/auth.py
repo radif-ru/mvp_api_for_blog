@@ -6,19 +6,19 @@ from config.settings import RESPONSE_MESSAGES
 from utils.response import get_response_serialized_in_json
 
 
-def user_auth_with_token(function):
+def auth_with_token(function):
     """ Аутентификация пользователя по токену.
     В заголовке (`headers`) `Authorization`
     необходимо указать действительный токен.
     В случае ошибки возвращает её описание.
     """
 
-    def wrap(request, *args, **kwargs):
+    def wrap(self, request, *args, **kwargs):
 
-        token: str = request.request.headers.get('Authorization')
+        token: str or None = request.headers.get('Authorization')
         message: dict = {'status': RESPONSE_MESSAGES.success}
         if not token:
-            message['error'] = RESPONSE_MESSAGES.no_success
+            message['status'] = RESPONSE_MESSAGES.no_success
             message['error'] = RESPONSE_MESSAGES.no_token
             response: HttpResponse = get_response_serialized_in_json(
                 content=message, status=401)
@@ -27,14 +27,14 @@ def user_auth_with_token(function):
                                          token__is_active=True).first()
 
         if not user:
-            message['error'] = RESPONSE_MESSAGES.no_success
+            message['status'] = RESPONSE_MESSAGES.no_success
             message['error'] = RESPONSE_MESSAGES.not_valid_token
             response: HttpResponse = get_response_serialized_in_json(
                 content=message, status=401)
             return response
 
-        login(request.request, user)
+        login(request, user)
 
-        return function(request, *args, **kwargs)
+        return function(self, request, *args, **kwargs)
 
     return wrap
