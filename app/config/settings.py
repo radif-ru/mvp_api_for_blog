@@ -29,14 +29,14 @@ if os.path.exists(environment_variables):
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', default='yp@cq+i8hq^nta7i_)a-')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'yp@cq+i8hq^nta7i_)a-')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Режим дебага из настроек переменных окружения, иначе из default
-DEBUG = int(os.environ.get('DEBUG', default=1))
+DEBUG = int(os.environ.get('DEBUG', 1))
 
 # Разрешённые хосты из настроек переменных окружения, иначе из default
-ALLOWED_HOSTS = [*os.environ.get('ALLOWED_HOSTS', default='*').split(' ')]
+ALLOWED_HOSTS = [*os.environ.get('ALLOWED_HOSTS', '*').split(' ')]
 
 # Application definition
 
@@ -87,14 +87,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get(
-            'SQL_ENGINE', default='django.db.backends.sqlite3'),
-        'NAME': os.environ.get(
-            'SQL_DATABASE', default=os.path.join(BASE_DIR, 'db.sqlite3')),
-        'USER': os.environ.get('SQL_USER', default='user'),
-        'PASSWORD': os.environ.get('SQL_PASSWORD', default='password'),
-        'HOST': os.environ.get('SQL_HOST', default='localhost'),
-        'PORT': os.environ.get('SQL_PORT', default='5432'),
+        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('SQL_DATABASE',
+                               os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': os.environ.get('SQL_USER', 'user'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
+        'HOST': os.environ.get('SQL_HOST', 'localhost'),
+        'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
 
@@ -148,9 +147,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 JSON_FILES_PATH = 'files/json'
 
-RESPONSE_MESSAGES = namedtuple('RESPONSE_STATUSES',
-                               ('success', 'no_success', 'no_required_fields', 'forbidden_act', 'not_found',
-                                'incorrect_data', 'no_token', 'not_valid_token'))
+RESPONSE_MESSAGES = namedtuple('RESPONSE_STATUSES', (
+    'success', 'no_success', 'no_required_fields', 'forbidden_act',
+    'not_found', 'incorrect_data', 'no_token', 'not_valid_token',
+    'json_error'))
 RESPONSE_MESSAGES.success = 'success'
 RESPONSE_MESSAGES.no_success = 'no success'
 RESPONSE_MESSAGES.no_required_fields = 'no_required_fields'
@@ -159,3 +159,4 @@ RESPONSE_MESSAGES.not_found = 'not found'
 RESPONSE_MESSAGES.incorrect_data = 'incorrect data'
 RESPONSE_MESSAGES.no_token = 'no token'
 RESPONSE_MESSAGES.not_valid_token = 'not valid token'
+RESPONSE_MESSAGES.json_error = 'data is accepted only in json format'
