@@ -6,7 +6,7 @@
 > `docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans`
 >
 > Запуск `dev` версии
-> `docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans`
+> `docker-compose -f docker-compose.dev.yml up -d --build --remove-orphans`
 > 
 > Флаг `-d` можно убрать для запуска не в фоне, так же если нет необходимости,
 > можно убрать `--remove-orphans`.
