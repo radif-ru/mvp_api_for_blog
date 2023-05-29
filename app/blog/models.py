@@ -11,8 +11,7 @@ class Article(ModelDeleteMixin, ModelPieceTextMixin, models.Model):
                                blank=False)
     title = models.CharField(verbose_name='название', max_length=150,
                              null=False, blank=False)
-    text = models.TextField(verbose_name='статья', null=False,
-                            blank=False)
+    text = models.TextField(verbose_name='статья', null=False, blank=False)
     is_active = models.BooleanField(verbose_name='активность', default=True,
                                     null=False, blank=False)
 

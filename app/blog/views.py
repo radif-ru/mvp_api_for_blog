@@ -18,7 +18,12 @@ class ArticleView(View):
 
         article_id: int = int(request.GET.get('id', 0))
         if article_id:
-            article: Article = Article.objects.filter(id=article_id).first()
+            article: Article or None = Article.objects.filter(
+                id=article_id).first()
+            if not article:
+                message: dict = {'status': RESPONSE_MESSAGES.no_success,
+                                 'error': RESPONSE_MESSAGES.forbidden_act}
+                return JsonResponse(data=message, status=403)
             comments: list = list(
                 Comment.objects.filter(article_id=article_id).values())
             data: dict = {'id': article.id,
@@ -34,25 +39,16 @@ class ArticleView(View):
                             json_dumps_params={'ensure_ascii': False})
 
     @auth_with_token
-    @json_request
-    def post(self, request, data, message, *args, **kwargs):
+    @json_request(required_fields=('title', 'text'))
+    def post(self, request, data: dict, message: dict, *args, **kwargs):
         """ Создать статью.
         Обязательные поля в теле запроса (`JSON`-формат): `title`, `text`.
         Возвращает сообщение с результатом и описание ошибки (если есть).
         """
 
         user: User = request.user
-        title: str = data['title'] if data.get('title') else ''
-        text: str = data['text'] if data.get('text') else ''
-
-        if not title:
-            message['status']: str = RESPONSE_MESSAGES.no_success
-            message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return JsonResponse(data=message, status=400)
-        if not text:
-            message['status']: str = RESPONSE_MESSAGES.no_success
-            message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return JsonResponse(data=message, status=400)
+        title: str = data['title']
+        text: str = data['text']
 
         article: Article = Article.objects.create(author_id=user.id,
                                                   title=title, text=text)
@@ -60,8 +56,8 @@ class ArticleView(View):
         return JsonResponse(data=message, status=201)
 
     @auth_with_token
-    @json_request
-    def patch(self, request, data, message, *args, **kwargs):
+    @json_request(required_fields=('id',))
+    def patch(self, request, data: dict, message: dict, *args, **kwargs):
         """ Редактировать статью.
         Обычному пользователю можно редактировать только свои статьи.
         Админу можно редактировать любые статьи.
@@ -71,9 +67,9 @@ class ArticleView(View):
         """
 
         user: User = request.user
-        article_id: int = int(data.pop('id')) if data.get('id') else 0
+        article_id: int = int(data.pop('id'))
 
-        if not article_id or ('title' not in data and 'text' not in data):
+        if 'title' not in data and 'text' not in data:
             message['status']: str = RESPONSE_MESSAGES.no_success
             message['error']: str = RESPONSE_MESSAGES.no_required_fields
             return JsonResponse(data=message, status=400)
@@ -93,8 +89,8 @@ class ArticleView(View):
             return JsonResponse(data=message, status=403)
 
     @auth_with_token
-    @json_request
-    def delete(self, request, data, message, *args, **kwargs):
+    @json_request(required_fields=('id',))
+    def delete(self, request, data: dict, message: dict, *args, **kwargs):
         """ Удалить статью (перенести в архив).
         Обычному пользователю можно удалять только свои статьи.
         Админу можно удалять любые статьи.
@@ -104,12 +100,7 @@ class ArticleView(View):
         """
 
         user: User = request.user
-        article_id: int = int(data['id']) if data.get('id') else 0
-
-        if not article_id:
-            message['status']: str = RESPONSE_MESSAGES.no_success
-            message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return JsonResponse(data=message, status=400)
+        article_id: int = int(data['id'])
 
         article: Article or None = Article.objects.filter(
             id=article_id, is_active=True).first()

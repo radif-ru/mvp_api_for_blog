@@ -11,8 +11,8 @@ from utils.token import gen_token
 
 class TokenView(View):
 
-    @json_request
-    def post(self, request, data, message, *args, **kwargs):
+    @json_request(required_fields=('username', 'password'))
+    def post(self, request, data: dict, message: dict, *args, **kwargs):
         """ Создать токен.
         Генерирует новый токен, в теле запроса (`JSON`-формат) необходимо
         передать `username` и `password`.
@@ -21,17 +21,8 @@ class TokenView(View):
         В случае ошибки возвращает её описание.
         """
 
-        username: str = data['username'] if data.get('username') else ''
-        password: str = data['password'] if data.get('password') else ''
-
-        if not username:
-            message['status']: str = RESPONSE_MESSAGES.no_success
-            message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return JsonResponse(data=message, status=400)
-        if not password:
-            message['status']: str = RESPONSE_MESSAGES.no_success
-            message['error']: str = RESPONSE_MESSAGES.no_required_fields
-            return JsonResponse(data=message, status=400)
+        username: str = data['username']
+        password: str = data['password']
 
         user: User = User.objects.filter(username=username).first()
         if user:
@@ -52,8 +43,8 @@ class TokenView(View):
             return JsonResponse(data=message, status=401)
 
     @auth_with_token
-    @json_request
-    def delete(self, request, data, message, *args, **kwargs):
+    @json_request()
+    def delete(self, request, data: dict, message: dict, *args, **kwargs):
         """ Удалить токен (перенести в архив).
         Токен должен быть указан в заголовке (`headers`) `Authorization`.
         Обычному пользователю можно удалить только

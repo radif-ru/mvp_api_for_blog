@@ -13,7 +13,7 @@ def auth_with_token(function):
     В случае ошибки возвращает её описание.
     """
 
-    def wrap(self, request, *args, **kwargs):
+    def wrapper(self, request, *args, **kwargs):
 
         token: str or None = request.headers.get('Authorization')
         message: dict = {'status': RESPONSE_MESSAGES.success}
@@ -35,6 +35,8 @@ def auth_with_token(function):
 
         login(request, user)
 
-        return function(self, request, *args, **kwargs)
+        result = function(self, request, *args, **kwargs)
 
-    return wrap
+        return result
+
+    return wrapper
