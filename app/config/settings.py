@@ -160,3 +160,26 @@ RESPONSE_MESSAGES.incorrect_data = 'incorrect data'
 RESPONSE_MESSAGES.no_token = 'no token'
 RESPONSE_MESSAGES.not_valid_token = 'not valid token'
 RESPONSE_MESSAGES.json_error = 'data is accepted only in json format'
+
+if DEBUG:
+    LOGGING = {
+        'version': 1,
+        'filters': {
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
+            }
+        },
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'filters': ['require_debug_true'],
+                'class': 'logging.StreamHandler',
+            }
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            }
+        }
+    }

@@ -5,7 +5,7 @@ from django.views import View
 from config.settings import RESPONSE_MESSAGES
 from decorators.auth import auth_with_token
 from decorators.request import json_request
-from .models import Article, Comment
+from .models import Article
 
 
 class ArticleView(View):
@@ -24,8 +24,7 @@ class ArticleView(View):
                 message: dict = {'status': RESPONSE_MESSAGES.no_success,
                                  'error': RESPONSE_MESSAGES.forbidden_act}
                 return JsonResponse(data=message, status=403)
-            comments: list = list(
-                Comment.objects.filter(article_id=article_id).values())
+            comments: list = list(article.comment_set.all().values())
             data: dict = {'id': article.id,
                           'title': article.title,
                           'text': article.text,
