@@ -26,7 +26,7 @@ services:
     restart: always
     build:
       context: ./
-      dockerfile: Dockerfile.app.prod
+      dockerfile: app.dev.Dockerfile
       args:
         HOME: /home/app
         APP_HOME: /home/app/backend

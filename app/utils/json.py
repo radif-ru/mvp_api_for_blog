@@ -5,7 +5,7 @@ from config.settings import JSON_FILES_PATH
 
 
 def load_from_json(file_name: str) -> list:
-    """Загружает данные из json файла, дампа таблицы, возвращает словарь
+    """ Загружает данные из json файла, дампа таблицы, возвращает словарь
     :param file_name: имя файла без постфикса, расширения
     """
     with open(
