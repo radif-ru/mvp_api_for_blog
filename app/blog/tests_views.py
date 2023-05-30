@@ -64,7 +64,10 @@ class ArticleViewTestCase(TestCase):
 
         # Вывод статьи и комментариев к ней по несуществующему id
         response = self.client.get(f'{self.endpoint}?id=999999999')
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
+        message = {'status': RESPONSE_MESSAGES.no_success,
+                   'error': RESPONSE_MESSAGES.not_found}
+        self.assertEqual(json.loads(response.content), message)
 
     def test_post(self):
         # Неавторизованный пользователь делает post запрос
@@ -103,6 +106,7 @@ class ArticleViewTestCase(TestCase):
             headers={'Authorization': self.auth_user_token.token},
             data=self.incorrect_post_data_2,
             content_type=self.content_type)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content), message)
 
         # Корректный запрос
