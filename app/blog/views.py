@@ -22,8 +22,8 @@ class ArticleView(View):
                 id=article_id).first()
             if not article:
                 message: dict = {'status': RESPONSE_MESSAGES.no_success,
-                                 'error': RESPONSE_MESSAGES.forbidden_act}
-                return JsonResponse(data=message, status=403)
+                                 'error': RESPONSE_MESSAGES.not_found}
+                return JsonResponse(data=message, status=404)
             comments: list = list(article.comment_set.all().values())
             data: dict = {'id': article.id,
                           'title': article.title,
