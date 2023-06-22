@@ -31,7 +31,7 @@ class Command(BaseCommand):
         :param password пароль
         :param is_superuser является ли админом? По умолчанию `False`
         """
-        if not User.objects.filter(username=username):
+        if not User.objects.filter(username=username).exists():
             if is_superuser:
                 user: User = User.objects.create_superuser(
                     username=username,
