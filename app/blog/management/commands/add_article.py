@@ -38,7 +38,7 @@ class Command(BaseCommand):
         if not author_id:
             # Случайный пользователь из существующих в БД
             author_id: int = randint(1, quantity_users)
-        if not Article.objects.filter(title=title):
+        if not Article.objects.filter(title=title).exists():
             Article.objects.create(author_id=author_id,
                                    title=title,
                                    text=text)

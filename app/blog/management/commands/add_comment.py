@@ -43,7 +43,7 @@ class Command(BaseCommand):
             # Случайная статья из существующих в БД
             article_id: int = randint(1, quantity_articles)
 
-        if not Comment.objects.filter(text=text):
+        if not Comment.objects.filter(text=text).exists():
             Comment.objects.create(
                 article_id=article_id,
                 user_id=user_id,
