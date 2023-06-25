@@ -18,7 +18,7 @@ def json_request(required_fields: Iterable or None = None):
         def wrapper(self, request, *args, **kwargs):
             message: dict = {'status': RESPONSE_MESSAGES.success}
             try:
-                data: dict = json.loads(request.body)
+                data: dict = json.loads(request.body) if request.body else {}
             except JSONDecodeError:
                 message['status']: str = RESPONSE_MESSAGES.no_success
                 message['error']: str = RESPONSE_MESSAGES.json_error
