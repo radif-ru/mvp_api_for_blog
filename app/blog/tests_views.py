@@ -1,4 +1,3 @@
-""" Примеры некоторых тестов """
 import json
 
 from django.contrib.auth.models import User
@@ -16,16 +15,16 @@ class ArticleViewTestCase(TestCase):
         self.endpoint = '/api/articles/'
 
         self.auth_user = mixer.blend(User, is_superuser=False)
-        self.auth_user_is_superuser = mixer.blend(User, is_superuser=True)
+        self.auth_superuser = mixer.blend(User, is_superuser=True)
         self.no_auth_user = mixer.blend(User)
 
-        # Пример активного токена
+        # Пример активного токена пользователя
         self.auth_user_token = mixer.blend(Token, user_id=self.auth_user.id,
                                            is_active=True, token=gen_token(32))
-        # Пример активного токена
-        self.auth_user_is_superuser_token = mixer.blend(
+        # Пример активного токена админа
+        self.auth_superuser_token = mixer.blend(
             Token,
-            user_id=self.auth_user_is_superuser.id,
+            user_id=self.auth_superuser.id,
             is_active=True,
             token=gen_token(32))
         # Пример удалённого (архивного) токена
@@ -56,6 +55,7 @@ class ArticleViewTestCase(TestCase):
         self.content_type = 'application/json'
 
     def test_get(self):
+        """ Тестирование GET запросов """
         response = self.client.get(self.endpoint)
         self.assertEqual(response.status_code, 200)
 
@@ -70,6 +70,7 @@ class ArticleViewTestCase(TestCase):
         self.assertEqual(json.loads(response.content), message)
 
     def test_post(self):
+        """ Тестирование POST запросов """
         # Неавторизованный пользователь делает post запрос
         response = self.client.post(self.endpoint)
         self.assertEqual(response.status_code, 401)
@@ -124,6 +125,7 @@ class ArticleViewTestCase(TestCase):
                          RESPONSE_MESSAGES.success)
 
     def test_patch(self):
+        """ Тестирование PATCH запросов """
         # Неавторизованный пользователь делает patch запрос
         response = self.client.patch(self.endpoint)
         self.assertEqual(response.status_code, 401)
@@ -162,6 +164,7 @@ class ArticleViewTestCase(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_delete(self):
+        """ Тестирование DELETE запросов """
         # Неавторизованный пользователь делает delete запрос
         response = self.client.delete(self.endpoint)
         self.assertEqual(response.status_code, 401)
